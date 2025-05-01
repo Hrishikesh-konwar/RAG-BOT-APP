@@ -73,21 +73,30 @@ export const POST = async (request: NextRequest) => {
 };
 
 const processPdfAndUploadToPinecone = async (pdfFile: File, documentId: string) => {
-  return new Promise<{ totalChunks: number, pineconeResponse: any[] }>(async (resolve, reject) => {
+  return new Promise<{ totalChunks: number, pineconeResponse: unknown[] }>(async (resolve, reject) => {
     try {
       const arrayBuffer = await pdfFile.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
       const pdfParser = new PDFParser();
       const allChunks: TextChunk[] = [];
 
-      pdfParser.on("pdfParser_dataError", (errData: any) => {
+      pdfParser.on("pdfParser_dataError", (errData: unknown) => {
         console.error("❌ PDF parsing failed (pdf2json):", errData);
         reject(new Error(
           "This PDF could not be parsed. It might be corrupted or generated using an unsupported format. Please upload a valid PDF."
         ));
       });
 
-      pdfParser.on("pdfParser_dataReady", async (pdfData: any) => {
+      type PDFData = {
+        Pages: {
+          Texts: {
+            R: { T: string }[];
+          }[];
+        }[];
+      };
+      
+      
+      pdfParser.on("pdfParser_dataReady", async (pdfData: PDFData) => {
         try {
           for (let i = 0; i < pdfData.Pages.length; i++) {
             const pageNumber = i + 1;
@@ -152,7 +161,7 @@ const createEmbeddings = async (texts: string[]) => {
 const uploadToPinecone = async (chunks: TextChunk[], vectors: number[][]) => {
   const index = pinecone.Index(indexName);
   const batchSize = 100;
-  const responses: any[] = [];
+  const responses: unknown[] = [];
   for (let i = 0; i < vectors.length; i += batchSize) {
     const batch = chunks.slice(i, i + batchSize).map((chunk, j) => ({
       id: chunk.id,
