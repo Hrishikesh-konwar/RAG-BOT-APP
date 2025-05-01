@@ -7,7 +7,6 @@ import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 const FileUploadComponent: React.FC = () => {
     const [message, setMessage] = React.useState<string | null>(null);
     const [error, setError] = React.useState<string | null>(null);
-    const [cleanDb, setCleanDb] = React.useState(false); // Add checkbox or toggle for this in future
 
     const handleUpload = () => {
         const el = document.createElement('input');
@@ -20,7 +19,6 @@ const FileUploadComponent: React.FC = () => {
                 if (file) {
                     const formData = new FormData();
                     formData.append('pdf', file);
-                    formData.append('cleanDb', cleanDb.toString());
 
                     try {
                         const res = await fetch('/api/upload', {
@@ -57,17 +55,6 @@ const FileUploadComponent: React.FC = () => {
                     <h1>Upload PDF</h1>
                     <Upload />
                 </div>
-            </div>
-            <div className="text-sm text-gray-300 pt-10">
-                <label className="inline-flex items-center gap-2">
-                    <input
-                        type="checkbox"
-                        checked={cleanDb}
-                        onChange={() => setCleanDb(!cleanDb)}
-                        className="accent-blue-500"
-                    />
-                    Clean previous data before upload
-                </label>
             </div>
             {message && (
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-green-100 text-green-800 border border-green-300 mt-4">

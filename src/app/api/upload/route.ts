@@ -30,7 +30,6 @@ type TextChunk = {
 export const POST = async (request: NextRequest) => {
   const formData = await request.formData();
   const pdfFile = formData.get("pdf") as File;
-  const cleanDb = formData.get("cleanDb") === "true";
   if (!pdfFile || !pdfFile.name.endsWith(".pdf")) {
     return new Response(JSON.stringify({ error: "Please upload a valid PDF file" }), {
       status: 400,
@@ -39,19 +38,7 @@ export const POST = async (request: NextRequest) => {
   }
   try {
     const documentId = `pdf_${Date.now()}_${pdfFile.name.replace(/[^a-zA-Z0-9]/g, "_")}`;
-    if (cleanDb) {
-      const index = pinecone.Index(indexName);
-      try {
-        const deleteResponse = await index.deleteMany({ });
-        return deleteResponse;
-      } catch (error) {
-        console.error("Error deleting all vectors from Pinecone:", error);
-        return { error: (error as Error).message };
-      }
-    }
-
     const result = await processPdfAndUploadToPinecone(pdfFile, documentId);
-
     return new Response(JSON.stringify({
       success: true,
       documentId,
