@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: fullPrompt },
-              ],              
+            ],
             temperature: 0.2,
         });
 
@@ -60,9 +60,16 @@ export async function POST(req: NextRequest) {
         return new Response(JSON.stringify({ answer }), {
             headers: { "Content-Type": "application/json" },
         });
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error("Chat API error:", err);
-        return new Response(JSON.stringify({ error: err.message }), {
+
+        let errorMessage = "Internal Server Error";
+
+        if (err instanceof Error) {
+            errorMessage = err.message;
+        }
+
+        return new Response(JSON.stringify({ error: errorMessage }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
         });

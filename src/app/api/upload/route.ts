@@ -1,13 +1,13 @@
 import type { NextRequest } from "next/server";
 import PDFParser from "pdf2json";
-import OpenAI from "openai";
+// import OpenAI from "openai";
 import { Pinecone } from "@pinecone-database/pinecone";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { OpenAIEmbeddings } from "@langchain/openai";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY,
+// });
 
 const pinecone = new Pinecone({
   apiKey: process.env.PINECONE_API_KEY || '',
